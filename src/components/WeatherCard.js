@@ -2,8 +2,7 @@ import React, { useState, useEffect } from "react";
 import { FaSearch, FaSyncAlt } from "react-icons/fa";
 import { motion } from "framer-motion";
 
-const WeatherCard = ({ weather, fetchWeather, city, setCity, darkMode }) => {
-  const [unit, setUnit] = useState("metric");
+const WeatherCard = ({ weather, fetchWeather, city, setCity, unit, setUnit, darkMode }) => {
   const [temperature, setTemperature] = useState(null);
   const [windSpeed, setWindSpeed] = useState(null);
 
@@ -14,7 +13,6 @@ const WeatherCard = ({ weather, fetchWeather, city, setCity, darkMode }) => {
       setWindSpeed(weather.wind.speed);
     }
   }, [weather]);
-
   // Function to toggle units
   const toggleUnit = () => {
     if (temperature !== null && windSpeed !== null) {
