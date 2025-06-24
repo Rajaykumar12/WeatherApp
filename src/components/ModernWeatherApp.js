@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import { motion } from "framer-motion";
 import "./ModernWeatherApp.css";
+import PWAInstall from "./PWAInstall";
 import { 
   WiDaySunny, 
   WiCloudy, 
@@ -11,10 +12,7 @@ import {
   WiFog,
   WiStrongWind,
   WiHumidity,
-  WiBarometer,
-  WiThermometer,
-  WiSunrise,
-  WiSunset
+  WiSunrise
 } from "react-icons/wi";
 import { FiSearch, FiMapPin } from "react-icons/fi";
 
@@ -23,11 +21,10 @@ const BASE_URL = "https://api.openweathermap.org/data/2.5/weather";
 const FORECAST_URL = "https://api.openweathermap.org/data/2.5/forecast";
 
 const ModernWeatherApp = () => {
-  const [city, setCity] = useState("");
-  const [weather, setWeather] = useState(null);
+  const [city, setCity] = useState("");  const [weather, setWeather] = useState(null);
   const [forecast, setForecast] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [unit, setUnit] = useState("metric");
+  const [unit] = useState("metric");
 
   const getWeatherIcon = (weatherCode, isDay = true) => {
     const iconMap = {
@@ -234,9 +231,7 @@ const ModernWeatherApp = () => {
           <WeatherIcon size={24} />
           <span>{weather.weather[0].description}</span>
         </div>
-      </motion.div>
-
-      {/* Search Again Button */}
+      </motion.div>      {/* Search Again Button */}
       <motion.button 
         className="search-again-btn"
         onClick={() => setWeather(null)}
@@ -246,6 +241,9 @@ const ModernWeatherApp = () => {
       >
         Search Another City
       </motion.button>
+      
+      {/* PWA Install Prompt */}
+      <PWAInstall />
     </div>
   );
 };
