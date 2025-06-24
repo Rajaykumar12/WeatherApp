@@ -1,7 +1,7 @@
 {
-  "name": "Modern Weather App",
-  "short_name": "WeatherApp",
-  "description": "A modern, premium weather app with offline support",
+  "name": "KNOWEA - Weather Forecast App",
+  "short_name": "KNOWEA",
+  "description": "Beautiful weather forecasting app with modern UI and offline support",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#1a1a2e",
