@@ -86,10 +86,9 @@ const PWAInstall = () => {
       <div className="pwa-install-content">
         <div className="pwa-install-icon">
           📱
-        </div>
-        <div className="pwa-install-text">
-          <h3>Install Weather App</h3>
-          <p>Get the full experience! Install our app for faster access and offline weather updates.</p>
+        </div>        <div className="pwa-install-text">
+          <h3>Install KNOWEA</h3>
+          <p>Get the full experience! Install our weather app for faster access and offline updates.</p>
         </div>
         <div className="pwa-install-actions">
           <button 

@@ -1,14 +1,18 @@
-# 🌤️ Modern Weather PWA
+# 🌤️ KNOWEA - Beautiful Weather, Beautiful Experience
 
 <div align="center">
+  <h1>KNOWEA</h1>
+  <h3>Beautiful Weather. Beautiful Experience.</h3>
+  <p>A modern Progressive Web App for weather forecasting with offline support</p>
+  
   <img src="https://img.shields.io/badge/React-18.2.0-61DAFB?style=for-the-badge&logo=react&logoColor=white" alt="React" />
   <img src="https://img.shields.io/badge/PWA-Enabled-4285F4?style=for-the-badge&logo=googlechrome&logoColor=white" alt="PWA" />
-  <img src="https://img.shields.io/badge/Bootstrap-5.3.0-7952B3?style=for-the-badge&logo=bootstrap&logoColor=white" alt="Bootstrap" />
-  <img src="https://img.shields.io/badge/Framer_Motion-10.16.4-0055FF?style=for-the-badge&logo=framer&logoColor=white" alt="Framer Motion" />
+  <img src="https://img.shields.io/badge/Framer_Motion-12.4.7-0055FF?style=for-the-badge&logo=framer&logoColor=white" alt="Framer Motion" />
+  <img src="https://img.shields.io/badge/OpenWeather-API-orange?style=for-the-badge&logo=weather&logoColor=white" alt="OpenWeather API" />
 </div>
 
 <div align="center">
-  <h3>A beautiful, modern Progressive Web App for weather forecasting with offline support</h3>
+  <h3>Experience weather like never before with KNOWEA's beautiful interface</h3>
   <p>Built with React, featuring glassmorphism UI design and mobile-first architecture</p>
 </div>
 
@@ -16,29 +20,29 @@
 
 ### 🎨 **Modern UI/UX**
 - **Glassmorphism Design** - Beautiful gradient backgrounds with blur effects
+- **KNOWEA Branding** - Custom logo and professional appearance
 - **Mobile-First** - Responsive design optimized for all screen sizes
-- **Dark Mode Support** - Toggle between light and dark themes
 - **Smooth Animations** - Powered by Framer Motion for seamless transitions
-- **Weather Icons** - Dynamic icons based on current conditions
+- **Dynamic Weather Icons** - Beautiful icons that change with conditions
 
 ### 📱 **Progressive Web App**
-- **Installable** - Add to home screen on any device
+- **Installable** - Add KNOWEA to home screen on any device
 - **Offline Support** - Works without internet connection
-- **Service Worker** - Caches resources for faster loading
-- **App-like Experience** - Runs in standalone mode
-- **Cross-Platform** - Works on iOS, Android, and Desktop
+- **Service Worker** - Caches resources for lightning-fast loading
+- **App-like Experience** - Runs in standalone mode like a native app
+- **Cross-Platform** - Works perfectly on iOS, Android, and Desktop
 
 ### 🌦️ **Weather Features**
-- **Current Weather** - Real-time weather data for any city
+- **Real-time Weather** - Current conditions for any city worldwide
 - **5-Day Forecast** - Extended weather predictions
-- **Hourly Forecast** - Next 24 hours detailed forecast
-- **Weather Details** - Temperature, humidity, wind speed, UV index
-- **Multiple Units** - Celsius/Fahrenheit, m/s/mph conversion
-- **Location Search** - Find weather for any city worldwide
+- **Hourly Forecast** - Next 24 hours detailed breakdown
+- **Detailed Metrics** - Temperature, humidity, wind speed, and more
+- **Smart Search** - Find weather for any location instantly
+- **Automatic Updates** - Fresh data every time you open KNOWEA
 
-## 🚀 Demo
+## 🚀 Live Demo
 
-**Live Demo:** [https://yourusername.github.io/WeatherApp](https://yourusername.github.io/WeatherApp)
+**Experience KNOWEA:** [https://yourusername.github.io/WeatherApp](https://yourusername.github.io/WeatherApp)
 
 ### Screenshots
 

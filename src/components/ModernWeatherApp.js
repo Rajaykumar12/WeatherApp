@@ -110,12 +110,14 @@ const ModernWeatherApp = () => {
       description: item.weather[0].description
     }));
   };
-
   if (!weather) {
     return (
       <div className="modern-weather-app">
         <div className="search-container">
-          <h1 className="app-title">Weather</h1>
+          <div className="app-branding">
+            <h1 className="app-title">KNOWEA</h1>
+            <p className="app-subtitle">Beautiful Weather, Beautiful Experience</p>
+          </div>
           <div className="search-box">
             <FiSearch className="search-icon" />
             <input
