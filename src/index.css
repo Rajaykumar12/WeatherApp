@@ -2,6 +2,81 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Weather Particles Animations */
+@keyframes rain-fall {
+  0% {
+    transform: translateY(-100vh) translateX(0px);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) translateX(100px);
+    opacity: 0.3;
+  }
+}
+
+@keyframes snow-fall {
+  0% {
+    transform: translateY(-100vh) translateX(0px) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) translateX(50px) rotate(360deg);
+    opacity: 0.3;
+  }
+}
+
+@keyframes cloud-drift {
+  0% {
+    transform: translateX(-100px);
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 0.7;
+  }
+  100% {
+    transform: translateX(100vw);
+    opacity: 0.3;
+  }
+}
+
+@keyframes lightning-flash {
+  0%,
+  90%,
+  100% {
+    opacity: 0;
+  }
+  5%,
+  85% {
+    opacity: 1;
+  }
+}
+
+.rain-drop {
+  animation: rain-fall linear infinite;
+}
+
+.snow-flake {
+  animation: snow-fall linear infinite;
+}
+
+.cloud-particle {
+  animation: cloud-drift linear infinite;
+}
+
+.lightning-flash {
+  animation: lightning-flash 0.5s ease-in-out infinite;
+}
+
+/* Scrollbar hide utility */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
