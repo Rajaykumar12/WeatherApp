@@ -1,8 +1,13 @@
 import React from "react";
 import WeatherApp from "./components/WeatherApp";
+import ErrorBoundary from "./components/ErrorBoundary";
 
 const App = () => {
-  return <WeatherApp />;
+  return (
+    <ErrorBoundary>
+      <WeatherApp />
+    </ErrorBoundary>
+  );
 };
 
 export default App;

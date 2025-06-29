@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Search, Sun, Moon } from 'lucide-react';
+import { Search, Sun, Moon, MapPin } from 'lucide-react';
 
 const SearchBox = ({ 
   city, 
@@ -8,7 +8,9 @@ const SearchBox = ({
   loading, 
   onSearch, 
   darkMode, 
-  setDarkMode 
+  setDarkMode,
+  onLocationSearch,
+  locationError
 }) => {
   const handleKeyPress = (e) => {
     if (e.key === 'Enter') {
@@ -98,7 +100,7 @@ const SearchBox = ({
         </motion.div>
         
         <motion.div 
-          className="relative w-full max-w-md md:max-w-lg lg:max-w-xl mb-10"
+          className="relative w-full max-w-md md:max-w-lg lg:max-w-xl mb-6"
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.3, duration: 0.6 }}
@@ -141,6 +143,38 @@ const SearchBox = ({
             )}
           </div>
         </motion.div>
+
+        {/* Geolocation Button */}
+        <motion.div
+          className="mb-6"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4, duration: 0.6 }}
+        >
+          <button
+            onClick={onLocationSearch}
+            disabled={loading}
+            className={`flex items-center justify-center gap-2 py-3 px-6 rounded-full transition-all duration-300 backdrop-blur-sm border-2 hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed ${
+              darkMode 
+                ? 'bg-darkPalette-card/40 border-darkPalette-accent/30 text-darkPalette-text hover:bg-darkPalette-card/60 hover:border-darkPalette-accent/50'
+                : 'bg-lightPalette-accent/20 border-lightPalette-secondary/20 text-lightPalette-text hover:bg-lightPalette-accent/30 hover:border-lightPalette-secondary/40'
+            }`}
+          >
+            <MapPin className="w-5 h-5" />
+            <span className="text-sm md:text-base font-medium">Use My Location</span>
+          </button>
+        </motion.div>
+
+        {/* Location Error */}
+        {locationError && (
+          <motion.div
+            className="mb-6 p-4 rounded-lg bg-red-500/20 border border-red-500/30 text-red-400 text-center"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+          >
+            <p className="text-sm md:text-base">{locationError}</p>
+          </motion.div>
+        )}
         
         <motion.div
           className="text-center opacity-80 w-full max-w-2xl mx-auto"

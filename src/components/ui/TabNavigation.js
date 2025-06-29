@@ -1,12 +1,13 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Sun, Clock, Calendar } from 'lucide-react';
+import { Sun, Clock, Calendar, Wind } from 'lucide-react';
 
 const TabNavigation = ({ activeTab, setActiveTab }) => {
   const tabs = [
     { key: 'current', label: 'Current', icon: Sun },
     { key: 'hourly', label: 'Hourly', icon: Clock },
-    { key: 'daily', label: '5-Day', icon: Calendar }
+    { key: 'daily', label: '5-Day', icon: Calendar },
+    { key: 'air', label: 'Air Quality', icon: Wind }
   ];
 
   return (
