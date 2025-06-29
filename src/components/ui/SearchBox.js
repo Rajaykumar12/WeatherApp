@@ -15,6 +15,7 @@ const SearchBox = ({
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
+  const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState(-1);
   const searchTimeoutRef = useRef(null);
   const suggestionRef = useRef(null);
 
@@ -31,8 +32,13 @@ const SearchBox = ({
     try {
       setIsLoadingSuggestions(true);
       const response = await fetch(
-        `http://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(query)}&limit=5&appid=${API_KEY}`
+        `https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(query)}&limit=5&appid=${API_KEY}`
       );
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
       const data = await response.json();
       
       // Format suggestions with country and state info
@@ -42,15 +48,24 @@ const SearchBox = ({
         state: item.state,
         lat: item.lat,
         lon: item.lon,
-        displayName: `${item.name}${item.state ? `, ${item.state}` : ''}, ${item.country}`
+        displayName: `${item.name}${item.state ? `, ${item.state}` : ''}, ${item.country}`,
+        fullName: item.local_names?.en || item.name // Use English name if available
       }));
 
-      setSuggestions(formattedSuggestions);
-      setShowSuggestions(formattedSuggestions.length > 0);
+      // Remove duplicates based on coordinates
+      const uniqueSuggestions = formattedSuggestions.filter((item, index, self) => 
+        index === self.findIndex(t => (
+          Math.abs(t.lat - item.lat) < 0.01 && Math.abs(t.lon - item.lon) < 0.01
+        ))
+      );
+
+      setSuggestions(uniqueSuggestions);
+      setShowSuggestions(uniqueSuggestions.length > 0);
     } catch (error) {
       console.error('Error fetching suggestions:', error);
       setSuggestions([]);
       setShowSuggestions(false);
+      // Don't show error to user for autocomplete failures, just fail silently
     } finally {
       setIsLoadingSuggestions(false);
     }
@@ -60,22 +75,54 @@ const SearchBox = ({
   const handleInputChange = (e) => {
     const value = e.target.value;
     setCity(value);
+    setSelectedSuggestionIndex(-1); // Reset selection when typing
 
     // Clear previous timeout
     if (searchTimeoutRef.current) {
       clearTimeout(searchTimeoutRef.current);
     }
 
-    // Set new timeout for debounced search
-    searchTimeoutRef.current = setTimeout(() => {
-      fetchSuggestions(value);
-    }, 300);
+    // Only fetch suggestions if there's a meaningful input
+    if (value.trim().length >= 2) {
+      // Set new timeout for debounced search
+      searchTimeoutRef.current = setTimeout(() => {
+        fetchSuggestions(value.trim());
+      }, 300);
+    } else {
+      setSuggestions([]);
+      setShowSuggestions(false);
+    }
   };
 
   const handleKeyPress = (e) => {
     if (e.key === 'Enter') {
+      e.preventDefault();
+      if (showSuggestions && selectedSuggestionIndex >= 0 && suggestions[selectedSuggestionIndex]) {
+        // Select the highlighted suggestion
+        handleSuggestionClick(suggestions[selectedSuggestionIndex]);
+      } else {
+        // Search with current input
+        setShowSuggestions(false);
+        setSelectedSuggestionIndex(-1);
+        onSearch();
+      }
+    } else if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      if (showSuggestions && suggestions.length > 0) {
+        setSelectedSuggestionIndex(prev => 
+          prev < suggestions.length - 1 ? prev + 1 : 0
+        );
+      }
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      if (showSuggestions && suggestions.length > 0) {
+        setSelectedSuggestionIndex(prev => 
+          prev > 0 ? prev - 1 : suggestions.length - 1
+        );
+      }
+    } else if (e.key === 'Escape') {
       setShowSuggestions(false);
-      onSearch();
+      setSelectedSuggestionIndex(-1);
     }
   };
 
@@ -83,11 +130,16 @@ const SearchBox = ({
     setCity(suggestion.displayName);
     setShowSuggestions(false);
     setSuggestions([]);
-    onSearch(suggestion.name);
+    setSelectedSuggestionIndex(-1);
+    // Use the exact city name from the suggestion for better accuracy
+    onSearch(suggestion.fullName || suggestion.name);
   };
 
   const handleQuickCityClick = (cityName) => {
     setCity(cityName);
+    setShowSuggestions(false);
+    setSuggestions([]);
+    setSelectedSuggestionIndex(-1);
     onSearch(cityName);
   };
 
@@ -95,6 +147,7 @@ const SearchBox = ({
     setCity('');
     setSuggestions([]);
     setShowSuggestions(false);
+    setSelectedSuggestionIndex(-1);
   };
 
   const handleDarkModeToggle = () => {
@@ -115,6 +168,7 @@ const SearchBox = ({
     const handleClickOutside = (event) => {
       if (suggestionRef.current && !suggestionRef.current.contains(event.target)) {
         setShowSuggestions(false);
+        setSelectedSuggestionIndex(-1);
       }
     };
 
@@ -224,7 +278,7 @@ const SearchBox = ({
               placeholder={loading ? "Searching..." : "Search for a city..."}
               value={city}
               onChange={handleInputChange}
-              onKeyPress={handleKeyPress}
+              onKeyDown={handleKeyPress}
               className={`flex-1 py-4 px-3 text-base bg-transparent border-none outline-none disabled:opacity-70 disabled:cursor-not-allowed ${
                 darkMode 
                   ? 'text-darkPalette-text placeholder-darkPalette-textSecondary'
@@ -292,9 +346,13 @@ const SearchBox = ({
                       transition={{ duration: 0.2, delay: index * 0.05 }}
                       onClick={() => handleSuggestionClick(suggestion)}
                       className={`w-full p-4 text-left transition-colors border-b last:border-b-0 ${
-                        darkMode 
-                          ? 'text-darkPalette-text hover:bg-darkPalette-accent/20 border-darkPalette-accent/20' 
-                          : 'text-lightPalette-text hover:bg-lightPalette-accent/20 border-lightPalette-secondary/20'
+                        selectedSuggestionIndex === index
+                          ? darkMode 
+                            ? 'bg-darkPalette-accent/30 text-darkPalette-highlight border-darkPalette-accent/30' 
+                            : 'bg-lightPalette-accent/30 text-lightPalette-secondary border-lightPalette-secondary/30'
+                          : darkMode 
+                            ? 'text-darkPalette-text hover:bg-darkPalette-accent/20 border-darkPalette-accent/20' 
+                            : 'text-lightPalette-text hover:bg-lightPalette-accent/20 border-lightPalette-secondary/20'
                       }`}
                     >
                       <div className="flex items-center space-x-3">
@@ -358,9 +416,9 @@ const SearchBox = ({
         >
           <p className={`mb-4 text-sm md:text-base ${
             darkMode ? 'text-darkPalette-textSecondary' : 'text-lightPalette-textSecondary'
-          }`}>Try searching for cities like:</p>
+          }`}>Popular cities to explore:</p>
           <div className="flex gap-3 md:gap-4 flex-wrap justify-center items-center">
-            {['Mangalore', 'Bangalore', 'Tokyo', 'Paris'].map((suggestion, index) => (
+            {['New York', 'London', 'Tokyo', 'Sydney', 'Dubai', 'Mumbai'].map((suggestion, index) => (
               <motion.button
                 key={suggestion}
                 className={`py-2 px-4 md:py-3 md:px-5 border rounded-full md:rounded-3xl text-sm md:text-base cursor-pointer transition-all duration-300 backdrop-blur-sm hover:-translate-y-0.5 ${
