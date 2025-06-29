@@ -1,6 +1,6 @@
-import React from 'react';
-import { motion } from 'framer-motion';
-import { Search, Sun, Moon, MapPin } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Search, Sun, Moon, MapPin, X } from 'lucide-react';
 
 const SearchBox = ({ 
   city, 
@@ -12,15 +12,89 @@ const SearchBox = ({
   onLocationSearch,
   locationError
 }) => {
+  const [suggestions, setSuggestions] = useState([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
+  const searchTimeoutRef = useRef(null);
+  const suggestionRef = useRef(null);
+
+  const API_KEY = process.env.REACT_APP_WEATHER_API_KEY;
+
+  // Fetch suggestions from OpenWeatherMap Geocoding API
+  const fetchSuggestions = async (query) => {
+    if (query.length < 2) {
+      setSuggestions([]);
+      setShowSuggestions(false);
+      return;
+    }
+
+    try {
+      setIsLoadingSuggestions(true);
+      const response = await fetch(
+        `http://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(query)}&limit=5&appid=${API_KEY}`
+      );
+      const data = await response.json();
+      
+      // Format suggestions with country and state info
+      const formattedSuggestions = data.map(item => ({
+        name: item.name,
+        country: item.country,
+        state: item.state,
+        lat: item.lat,
+        lon: item.lon,
+        displayName: `${item.name}${item.state ? `, ${item.state}` : ''}, ${item.country}`
+      }));
+
+      setSuggestions(formattedSuggestions);
+      setShowSuggestions(formattedSuggestions.length > 0);
+    } catch (error) {
+      console.error('Error fetching suggestions:', error);
+      setSuggestions([]);
+      setShowSuggestions(false);
+    } finally {
+      setIsLoadingSuggestions(false);
+    }
+  };
+
+  // Debounced search input handler
+  const handleInputChange = (e) => {
+    const value = e.target.value;
+    setCity(value);
+
+    // Clear previous timeout
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+
+    // Set new timeout for debounced search
+    searchTimeoutRef.current = setTimeout(() => {
+      fetchSuggestions(value);
+    }, 300);
+  };
+
   const handleKeyPress = (e) => {
     if (e.key === 'Enter') {
+      setShowSuggestions(false);
       onSearch();
     }
   };
 
   const handleSuggestionClick = (suggestion) => {
-    setCity(suggestion);
-    onSearch(suggestion);
+    setCity(suggestion.displayName);
+    setShowSuggestions(false);
+    setSuggestions([]);
+    onSearch(suggestion.name);
+  };
+
+  const handleQuickCityClick = (cityName) => {
+    setCity(cityName);
+    onSearch(cityName);
+  };
+
+  const clearSearch = () => {
+    setCity('');
+    setSuggestions([]);
+    setShowSuggestions(false);
   };
 
   const handleDarkModeToggle = () => {
@@ -36,6 +110,27 @@ const SearchBox = ({
     }
   };
 
+  // Close suggestions when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (suggestionRef.current && !suggestionRef.current.contains(event.target)) {
+        setShowSuggestions(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+      }
+    };
+  }, []);
+
   return (
     <div className={`font-sf-pro w-screen h-screen transition-all duration-500 ${
       darkMode 
@@ -44,6 +139,7 @@ const SearchBox = ({
     } ${
       darkMode ? 'text-darkPalette-text' : 'text-lightPalette-text'
     } p-4 relative overflow-x-hidden overflow-y-auto scrollbar-hide box-border flex flex-col`}>
+      
       {/* Dark Mode Toggle for Search Screen */}
       <div className="absolute top-5 right-5 z-50">
         <button
@@ -99,7 +195,9 @@ const SearchBox = ({
           </motion.p>
         </motion.div>
         
+        {/* Search Container with Autocomplete */}
         <motion.div 
+          ref={suggestionRef}
           className="relative w-full max-w-md md:max-w-lg lg:max-w-xl mb-6"
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -109,7 +207,8 @@ const SearchBox = ({
             darkMode 
               ? 'bg-darkPalette-card/40 border-darkPalette-accent/30 focus-within:bg-darkPalette-card/60 focus-within:border-darkPalette-accent/50'
               : 'bg-lightPalette-accent/20 border-lightPalette-secondary/20 focus-within:bg-lightPalette-accent/30 focus-within:border-lightPalette-secondary/40'
-          }`}>
+          } ${showSuggestions ? 'rounded-b-none' : ''}`}>
+            
             <motion.div
               className="flex items-center justify-center pl-5 pr-2 pointer-events-none"
               animate={loading ? { rotate: 360 } : { rotate: 0 }}
@@ -119,19 +218,37 @@ const SearchBox = ({
                 darkMode ? 'text-darkPalette-textSecondary' : 'text-lightPalette-textSecondary'
               }`} />
             </motion.div>
+            
             <input
               type="text"
               placeholder={loading ? "Searching..." : "Search for a city..."}
               value={city}
-              onChange={(e) => setCity(e.target.value)}
+              onChange={handleInputChange}
               onKeyPress={handleKeyPress}
-              className={`flex-1 py-4 px-3 pr-5 text-base bg-transparent border-none outline-none disabled:opacity-70 disabled:cursor-not-allowed ${
+              className={`flex-1 py-4 px-3 text-base bg-transparent border-none outline-none disabled:opacity-70 disabled:cursor-not-allowed ${
                 darkMode 
                   ? 'text-darkPalette-text placeholder-darkPalette-textSecondary'
                   : 'text-lightPalette-text placeholder-lightPalette-textSecondary'
               }`}
               disabled={loading}
+              autoComplete="off"
             />
+            
+            {/* Clear Button */}
+            {city && (
+              <button
+                type="button"
+                onClick={clearSearch}
+                className={`mr-3 p-1 rounded-full transition-colors ${
+                  darkMode 
+                    ? 'text-darkPalette-textSecondary hover:bg-darkPalette-accent/20' 
+                    : 'text-lightPalette-textSecondary hover:bg-lightPalette-accent/20'
+                }`}
+              >
+                <X className="w-4 h-4" />
+              </button>
+            )}
+            
             {loading && (
               <motion.div
                 className="flex items-center justify-center pr-5 pl-2"
@@ -142,6 +259,63 @@ const SearchBox = ({
               </motion.div>
             )}
           </div>
+
+          {/* Suggestions Dropdown */}
+          <AnimatePresence>
+            {showSuggestions && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.2 }}
+                className={`absolute top-full left-0 right-0 backdrop-blur-xl rounded-b-2xl border-t-0 border-2 overflow-hidden shadow-xl z-20 ${
+                  darkMode 
+                    ? 'bg-darkPalette-card/90 border-darkPalette-accent/30' 
+                    : 'bg-lightPalette-accent/90 border-lightPalette-secondary/20'
+                }`}
+              >
+                {isLoadingSuggestions ? (
+                  <div className={`p-4 text-center ${
+                    darkMode ? 'text-darkPalette-textSecondary' : 'text-lightPalette-textSecondary'
+                  }`}>
+                    <div className="flex items-center justify-center space-x-2">
+                      <div className="w-4 h-4 bg-current rounded-full animate-pulse"></div>
+                      <span>Loading suggestions...</span>
+                    </div>
+                  </div>
+                ) : (
+                  suggestions.map((suggestion, index) => (
+                    <motion.button
+                      key={`${suggestion.lat}-${suggestion.lon}-${index}`}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.2, delay: index * 0.05 }}
+                      onClick={() => handleSuggestionClick(suggestion)}
+                      className={`w-full p-4 text-left transition-colors border-b last:border-b-0 ${
+                        darkMode 
+                          ? 'text-darkPalette-text hover:bg-darkPalette-accent/20 border-darkPalette-accent/20' 
+                          : 'text-lightPalette-text hover:bg-lightPalette-accent/20 border-lightPalette-secondary/20'
+                      }`}
+                    >
+                      <div className="flex items-center space-x-3">
+                        <MapPin className={`w-4 h-4 ${
+                          darkMode ? 'text-darkPalette-highlight' : 'text-lightPalette-secondary'
+                        }`} />
+                        <div>
+                          <div className="font-medium">{suggestion.name}</div>
+                          <div className={`text-sm ${
+                            darkMode ? 'text-darkPalette-textSecondary' : 'text-lightPalette-textSecondary'
+                          }`}>
+                            {suggestion.state && `${suggestion.state}, `}{suggestion.country}
+                          </div>
+                        </div>
+                      </div>
+                    </motion.button>
+                  ))
+                )}
+              </motion.div>
+            )}
+          </AnimatePresence>
         </motion.div>
 
         {/* Geolocation Button */}
@@ -168,7 +342,7 @@ const SearchBox = ({
         {/* Location Error */}
         {locationError && (
           <motion.div
-            className="mb-6 p-4 rounded-lg bg-red-500/20 border border-red-500/30 text-red-400 text-center"
+            className="mb-6 p-4 rounded-lg bg-red-500/20 border border-red-500/30 text-red-400 text-center max-w-md"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
           >
@@ -194,7 +368,7 @@ const SearchBox = ({
                     ? 'bg-darkPalette-card/30 border-darkPalette-accent/40 text-darkPalette-text hover:bg-darkPalette-card/50'
                     : 'bg-lightPalette-accent/10 border-lightPalette-secondary/20 text-lightPalette-text hover:bg-lightPalette-accent/20'
                 }`}
-                onClick={() => handleSuggestionClick(suggestion)}
+                onClick={() => handleQuickCityClick(suggestion)}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 1 + index * 0.1 }}

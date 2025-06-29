@@ -22,6 +22,7 @@ import DailyForecast from "./ui/DailyForecast";
 import ActionButtons from "./ui/ActionButtons";
 import AirQualityCard from "./ui/AirQualityCard";
 import LoadingSkeleton from "./ui/LoadingSkeleton";
+import TemperatureChart from "./ui/TemperatureChart";
 
 const API_KEY = process.env.REACT_APP_WEATHER_API_KEY;
 const BASE_URL = "https://api.openweathermap.org/data/2.5/weather";
@@ -443,7 +444,11 @@ const WeatherApp = () => {
           </div>
         )}
         {activeTab === 'hourly' && hourlyForecast && (
-          <div className="mb-6">
+          <div className="space-y-6">
+            <TemperatureChart 
+              hourlyForecast={hourlyForecast}
+              darkMode={darkMode}
+            />
             <HourlyForecast 
               hourlyForecast={hourlyForecast}
               getWeatherIcon={getWeatherIcon}
