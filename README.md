@@ -42,14 +42,7 @@
 
 ## 🚀 Live Demo
 
-**Experience KNOWEA:** [https://yourusername.github.io/WeatherApp](https://yourusername.github.io/WeatherApp)
-
-### Screenshots
-
-<div align="center">
-  <img src="screenshots/mobile-home.png" alt="Mobile Home" width="300" />
-  <img src="screenshots/desktop-view.png" alt="Desktop View" width="600" />
-</div>
+**Live Demo:** [https://rajaykumar12.github.io/WeatherApp](https://rajaykumar12.github.io/WeatherApp/)
 
 ## 🛠️ Installation & Setup
 
