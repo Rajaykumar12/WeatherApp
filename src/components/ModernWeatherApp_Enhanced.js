@@ -29,7 +29,7 @@ const ModernWeatherApp = () => {
   const [loading, setLoading] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
   const [unit] = useState("metric");
-  const [activeTab, setActiveTab] = useState("current"); // current, hourly, daily
+  const [activeTab, setActiveTab] = useState("current");
 
   const getWeatherIcon = (weatherCode, isDay = true) => {
     const iconMap = {
@@ -46,12 +46,12 @@ const ModernWeatherApp = () => {
       "10d": WiRain,
       "10n": WiRain,
       "11d": WiThunderstorm,
-      "11n": WiThunderstorm,      "13d": WiSnow,
+      "11n": WiThunderstorm,
+      "13d": WiSnow,
       "13n": WiSnow,
       "50d": WiFog,
       "50n": WiFog,
     };
-    
     return iconMap[weatherCode] || WiDaySunny;
   };
 
@@ -92,9 +92,9 @@ const ModernWeatherApp = () => {
         icon: item.weather[0].icon,
         description: item.weather[0].description,
         humidity: item.main.humidity,
-        windSpeed: Math.round(item.wind.speed * 3.6), // Convert m/s to km/h
+        windSpeed: Math.round(item.wind.speed * 3.6),
         pressure: item.main.pressure,
-        pop: Math.round(item.pop * 100), // Probability of precipitation
+        pop: Math.round(item.pop * 100),
         visibility: item.visibility ? Math.round(item.visibility / 1000) : null
       }));
       
@@ -110,14 +110,15 @@ const ModernWeatherApp = () => {
     return new Date(timestamp * 1000).toLocaleTimeString('en-US', {
       hour: '2-digit',
       minute: '2-digit',
-      hour12: false
+      hour12: true
     });
   };
 
   const getCurrentDate = () => {
     return new Date().toLocaleDateString('en-US', {
       weekday: 'long',
-      month: 'short',
+      year: 'numeric',
+      month: 'long',
       day: 'numeric'
     });
   };
@@ -135,10 +136,10 @@ const ModernWeatherApp = () => {
       description: item.weather[0].description
     }));
   };
+
   if (!weather) {
     return (
       <div className={`modern-weather-app ${darkMode ? 'dark-mode' : ''}`}>
-        {/* Dark Mode Toggle for Search Screen */}
         <motion.div
           className="search-dark-toggle"
           initial={{ opacity: 0, y: -20 }}
@@ -243,7 +244,7 @@ const ModernWeatherApp = () => {
   }
 
   const WeatherIcon = getWeatherIcon(weather.weather[0].icon);
-  // const hourlyData = getHourlyForecast(); // Using hourlyForecast state instead
+  const hourlyData = getHourlyForecast();
 
   return (
     <div className={`modern-weather-app ${darkMode ? 'dark-mode' : ''}`}>
@@ -384,7 +385,7 @@ const ModernWeatherApp = () => {
                 { icon: WiHumidity, label: 'Humidity', value: `${weather.main.humidity}%` },
                 { icon: WiThermometer, label: 'Pressure', value: `${weather.main.pressure} hPa` },
                 { icon: WiCloudy, label: 'Clouds', value: `${weather.clouds.all}%` },
-                { icon: WiDaySunny, label: 'UV Index', value: weather.uvi || 'N/A' }
+                { icon: WiDaySunny, label: 'Visibility', value: weather.visibility ? `${Math.round(weather.visibility / 1000)} km` : 'N/A' }
               ].map((item, index) => (
                 <motion.div
                   key={item.label}
@@ -454,7 +455,6 @@ const ModernWeatherApp = () => {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <h3 className="forecast-title">5-Day Forecast</h3>
             {forecast.list.filter((_, index) => index % 8 === 0).slice(0, 5).map((day, index) => {
               const DayIcon = getWeatherIcon(day.weather[0].icon);
               return (
@@ -491,7 +491,7 @@ const ModernWeatherApp = () => {
         )}
       </motion.div>
 
-      {/* Enhanced Search Again Button */}
+      {/* Enhanced Action Buttons */}
       <motion.div
         className="action-buttons"
         initial={{ opacity: 0, y: 20 }}
