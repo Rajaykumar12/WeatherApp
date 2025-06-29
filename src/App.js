@@ -1,9 +1,8 @@
 import React from "react";
-import ModernWeatherApp from "./components/ModernWeatherApp";
-import "bootstrap/dist/css/bootstrap.min.css";
+import WeatherApp from "./components/WeatherApp";
 
 const App = () => {
-  return <ModernWeatherApp />;
+  return <WeatherApp />;
 };
 
 export default App;
