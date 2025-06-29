@@ -122,19 +122,6 @@ const ModernWeatherApp = () => {
     });
   };
 
-  const getHourlyForecast = () => {
-    if (!forecast) return [];
-    return forecast.list.slice(0, 4).map(item => ({
-      time: new Date(item.dt * 1000).toLocaleTimeString('en-US', {
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: true
-      }),
-      temp: Math.round(item.main.temp),
-      icon: item.weather[0].icon,
-      description: item.weather[0].description
-    }));
-  };
   if (!weather) {
     return (
       <div className={`modern-weather-app ${darkMode ? 'dark-mode' : ''}`}>
@@ -455,38 +442,40 @@ const ModernWeatherApp = () => {
             transition={{ duration: 0.5 }}
           >
             <h3 className="forecast-title">5-Day Forecast</h3>
-            {forecast.list.filter((_, index) => index % 8 === 0).slice(0, 5).map((day, index) => {
-              const DayIcon = getWeatherIcon(day.weather[0].icon);
-              return (
-                <motion.div
-                  key={index}
-                  className="daily-item-enhanced"
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                  whileHover={{ scale: 1.02, backgroundColor: 'rgba(255,255,255,0.1)' }}
-                >
-                  <div className="daily-day">
-                    {new Date(day.dt * 1000).toLocaleDateString('en-US', { weekday: 'short' })}
-                  </div>
-                  <motion.div 
-                    className="daily-icon"
-                    whileHover={{ scale: 1.2 }}
+            <div className="daily-scroll">
+              {forecast.list.filter((_, index) => index % 8 === 0).slice(0, 5).map((day, index) => {
+                const DayIcon = getWeatherIcon(day.weather[0].icon);
+                return (
+                  <motion.div
+                    key={index}
+                    className="daily-item-enhanced"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                    whileHover={{ scale: 1.05, y: -5 }}
                   >
-                    <DayIcon size={36} />
+                    <div className="daily-day">
+                      {new Date(day.dt * 1000).toLocaleDateString('en-US', { weekday: 'short' })}
+                    </div>
+                    <motion.div 
+                      className="daily-icon"
+                      whileHover={{ scale: 1.2 }}
+                    >
+                      <DayIcon size={36} />
+                    </motion.div>
+                    <div className="daily-temps">
+                      <span className="daily-high">{Math.round(day.main.temp_max)}°</span>
+                      <span className="daily-low">{Math.round(day.main.temp_min)}°</span>
+                    </div>
+                    <div className="daily-desc">{day.weather[0].description}</div>
+                    <div className="daily-details">
+                      <span>💧 {day.main.humidity}%</span>
+                      {day.pop > 0 && <span>🌧️ {Math.round(day.pop * 100)}%</span>}
+                    </div>
                   </motion.div>
-                  <div className="daily-temps">
-                    <span className="daily-high">{Math.round(day.main.temp_max)}°</span>
-                    <span className="daily-low">{Math.round(day.main.temp_min)}°</span>
-                  </div>
-                  <div className="daily-desc">{day.weather[0].description}</div>
-                  <div className="daily-details">
-                    <span>💧 {day.main.humidity}%</span>
-                    {day.pop > 0 && <span>🌧️ {Math.round(day.pop * 100)}%</span>}
-                  </div>
-                </motion.div>
-              );
-            })}
+                );
+              })}
+            </div>
           </motion.div>
         )}
       </motion.div>

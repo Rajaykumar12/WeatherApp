@@ -17,17 +17,18 @@ html, body {
 
 @media screen and (min-width: 1024px) {
   #root {
-    align-items: center;
+    display: flex;
+    flex-direction: column;
   }
 }
 
 .modern-weather-app {
   font-family: 'SF Pro Display', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   width: 100vw;
-  height: 100vh;
+  min-height: 100vh;
   background: linear-gradient(180deg, #74b9ff 0%, #0984e3 50%, #74b9ff 100%);
   color: white;
-  padding: 16px;
+  padding: 12px;
   position: relative;
   overflow-x: hidden;
   overflow-y: auto;
@@ -46,9 +47,9 @@ html, body {
 
 @media screen and (min-width: 1024px) {
   .modern-weather-app {
-    padding: 48px;
-    justify-content: center;
-    align-items: center;
+    padding: 32px 48px;
+    justify-content: flex-start;
+    align-items: stretch;
   }
 }
 
@@ -974,15 +975,20 @@ html, body {
   border-radius: 20px;
   padding: 20px;
   border: 1px solid rgba(255, 255, 255, 0.1);
+  width: 100%;
+  overflow: hidden;
 }
 
 .hourly-scroll {
   display: flex;
   gap: 16px;
   overflow-x: auto;
+  overflow-y: hidden;
   padding: 10px 0;
   scrollbar-width: thin;
   scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+  -webkit-overflow-scrolling: touch;
+  white-space: nowrap;
 }
 
 .hourly-scroll::-webkit-scrollbar {
@@ -1001,12 +1007,15 @@ html, body {
 
 .hourly-item-enhanced {
   min-width: 120px;
+  flex-shrink: 0;
+  flex-grow: 0;
   text-align: center;
   padding: 16px 12px;
   background: rgba(255, 255, 255, 0.05);
   border-radius: 16px;
   border: 1px solid rgba(255, 255, 255, 0.1);
   transition: all 0.3s ease;
+  display: inline-block;
 }
 
 .hourly-item-enhanced:hover {
@@ -1054,6 +1063,8 @@ html, body {
   .hourly-item-enhanced {
     min-width: 140px;
     padding: 20px 16px;
+    flex-shrink: 0;
+    flex-grow: 0;
   }
   
   .hourly-time {
@@ -1083,16 +1094,15 @@ html, body {
   }
   
   .hourly-scroll {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
     gap: 24px;
-    overflow: visible;
-    padding: 0;
+    padding: 20px 0;
   }
   
   .hourly-item-enhanced {
-    min-width: auto;
+    min-width: 160px;
     padding: 24px 20px;
+    flex-shrink: 0;
+    flex-grow: 0;
   }
   
   .hourly-time {
@@ -1125,39 +1135,66 @@ html, body {
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
+.daily-scroll {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  padding: 10px 0;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+}
+
+.daily-scroll::-webkit-scrollbar {
+  height: 6px;
+}
+
+.daily-scroll::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+
+.daily-scroll::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 3px;
+}
+
 .daily-item-enhanced {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
   padding: 16px;
   background: rgba(255, 255, 255, 0.05);
   border-radius: 16px;
-  margin-bottom: 12px;
   border: 1px solid rgba(255, 255, 255, 0.1);
   transition: all 0.3s ease;
+  min-width: 120px;
+  text-align: center;
+  flex-shrink: 0;
 }
 
 .daily-item-enhanced:hover {
   background: rgba(255, 255, 255, 0.1);
-  transform: translateX(5px);
+  transform: translateY(-5px);
 }
 
 .daily-day {
-  min-width: 60px;
   font-weight: 600;
   font-size: 0.9rem;
+  margin-bottom: 8px;
 }
 
 .daily-icon {
-  min-width: 40px;
   text-align: center;
+  margin-bottom: 8px;
 }
 
 .daily-temps {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  min-width: 60px;
+  align-items: center;
+  margin-bottom: 8px;
 }
 
 .daily-high {
@@ -1171,16 +1208,20 @@ html, body {
 }
 
 .daily-desc {
-  flex: 1;
   text-transform: capitalize;
-  font-size: 0.9rem;
+  font-size: 0.8rem;
+  text-align: center;
+  margin-bottom: 8px;
+  line-height: 1.2;
 }
 
 .daily-details {
   display: flex;
-  gap: 12px;
-  font-size: 0.8rem;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.75rem;
   opacity: 0.8;
+  align-items: center;
 }
 
 /* Responsive Daily Forecast */
@@ -1189,24 +1230,25 @@ html, body {
     padding: 24px;
   }
   
-  .daily-item-enhanced {
-    padding: 20px;
+  .daily-scroll {
     gap: 20px;
-    margin-bottom: 16px;
+    padding: 15px 0;
+  }
+  
+  .daily-item-enhanced {
+    padding: 20px 16px;
+    gap: 12px;
+    min-width: 140px;
   }
   
   .daily-day {
-    min-width: 80px;
     font-size: 1rem;
-  }
-  
-  .daily-icon {
-    min-width: 50px;
+    margin-bottom: 10px;
   }
   
   .daily-temps {
-    min-width: 80px;
     gap: 6px;
+    margin-bottom: 10px;
   }
   
   .daily-high {
@@ -1218,12 +1260,13 @@ html, body {
   }
   
   .daily-desc {
-    font-size: 1rem;
+    font-size: 0.9rem;
+    margin-bottom: 10px;
   }
   
   .daily-details {
-    gap: 16px;
-    font-size: 0.9rem;
+    gap: 6px;
+    font-size: 0.8rem;
   }
 }
 
@@ -1232,25 +1275,26 @@ html, body {
     padding: 30px;
   }
   
-  .daily-item-enhanced {
-    padding: 24px;
+  .daily-scroll {
     gap: 24px;
-    margin-bottom: 20px;
+    padding: 20px 0;
+  }
+  
+  .daily-item-enhanced {
+    padding: 24px 20px;
+    gap: 16px;
+    min-width: 160px;
     border-radius: 20px;
   }
   
   .daily-day {
-    min-width: 100px;
     font-size: 1.1rem;
-  }
-  
-  .daily-icon {
-    min-width: 60px;
+    margin-bottom: 12px;
   }
   
   .daily-temps {
-    min-width: 100px;
     gap: 8px;
+    margin-bottom: 12px;
   }
   
   .daily-high {
@@ -1262,12 +1306,13 @@ html, body {
   }
   
   .daily-desc {
-    font-size: 1.1rem;
+    font-size: 1rem;
+    margin-bottom: 12px;
   }
   
   .daily-details {
-    gap: 20px;
-    font-size: 1rem;
+    gap: 8px;
+    font-size: 0.9rem;
   }
 }
 
@@ -1415,14 +1460,13 @@ html, body {
   }
   
   .daily-item-enhanced {
-    flex-direction: column;
-    text-align: center;
-    gap: 8px;
+    min-width: 100px;
+    padding: 12px 8px;
   }
   
   .daily-temps {
-    flex-direction: row;
-    gap: 8px;
+    flex-direction: column;
+    gap: 4px;
   }
   
   .action-buttons {
