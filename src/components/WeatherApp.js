@@ -24,7 +24,6 @@ import AirQualityCard from "./ui/AirQualityCard";
 import LoadingSkeleton from "./ui/LoadingSkeleton";
 import TemperatureChart from "./ui/TemperatureChart";
 import AdvancedCharts from "./ui/AdvancedCharts";
-import WeatherParticles from "./ui/WeatherParticles";
 
 const API_KEY = process.env.REACT_APP_WEATHER_API_KEY;
 const BASE_URL = "https://api.openweathermap.org/data/2.5/weather";
@@ -389,12 +388,6 @@ const WeatherApp = () => {
     } ${
       darkMode ? 'text-darkPalette-text' : 'text-lightPalette-text'
     } p-4 md:p-6 lg:p-8 relative overflow-x-hidden overflow-y-auto scrollbar-hide box-border flex flex-col justify-start`}>
-      
-      {/* Weather Particles Animation */}
-      <WeatherParticles 
-        weatherCondition={weather?.weather?.[0]?.main} 
-        darkMode={darkMode} 
-      />
       
       {/* Glassmorphism background effect */}
       <div className={`absolute inset-0 pointer-events-none transition-opacity duration-500 ${
