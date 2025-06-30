@@ -343,9 +343,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - **Bootstrap Team** - Responsive CSS framework
 - **PWA Community** - Progressive Web App best practices
 
-## 📧 Contact
-
-**Your Name** - [@yourtwitter](https://twitter.com/yourtwitter) - your.email@example.com
 
 **Project Link:** [https://rajaykumar12.github.io/WeatherApp/](https://rajaykumar12.github.io/WeatherApp/)
 
