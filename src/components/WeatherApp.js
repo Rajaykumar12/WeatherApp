@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { motion } from "framer-motion";
 import PWAInstall from "./PWAInstall";
@@ -26,6 +26,11 @@ import TemperatureChart from "./ui/TemperatureChart";
 import AdvancedCharts from "./ui/AdvancedCharts";
 
 const API_KEY = process.env.REACT_APP_WEATHER_API_KEY;
+
+// Validate API key
+if (!API_KEY || API_KEY === 'your_api_key_here') {
+  console.warn('Weather API key is not configured. Please set REACT_APP_WEATHER_API_KEY in your .env file.');
+}
 const BASE_URL = "https://api.openweathermap.org/data/2.5/weather";
 const FORECAST_URL = "https://api.openweathermap.org/data/2.5/forecast";
 const UV_URL = "https://api.openweathermap.org/data/2.5/uvi";
@@ -41,10 +46,23 @@ const WeatherApp = () => {
   const [weatherAlerts, setWeatherAlerts] = useState([]);
   const [extendedForecast, setExtendedForecast] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [darkMode, setDarkMode] = useState(false);
+  const [darkMode, setDarkMode] = useState(() => {
+    // Try to get dark mode preference from localStorage
+    const savedDarkMode = localStorage.getItem('knowea-darkMode');
+    if (savedDarkMode !== null) {
+      return savedDarkMode === 'true';
+    }
+    // If no saved preference, use system preference
+    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  });
   const [unit] = useState("metric");
   const [activeTab, setActiveTab] = useState("current");
   const [locationError, setLocationError] = useState(null);
+
+  // Save dark mode preference to localStorage
+  useEffect(() => {
+    localStorage.setItem('knowea-darkMode', darkMode.toString());
+  }, [darkMode]);
 
   const getWeatherIcon = (weatherCode) => {
     const iconMap = {
@@ -73,6 +91,11 @@ const WeatherApp = () => {
 
   // Get user's current location
   const getCurrentLocation = () => {
+    if (!API_KEY || API_KEY === 'your_api_key_here') {
+      setLocationError("Weather API key is not configured. Please add your API key to the .env file.");
+      return;
+    }
+    
     setLoading(true);
     setLocationError(null);
     
@@ -125,6 +148,7 @@ const WeatherApp = () => {
             units: unit,
             appid: API_KEY,
           },
+          timeout: 10000, // 10 second timeout
         }),
         axios.get(FORECAST_URL, {
           params: {
@@ -133,6 +157,7 @@ const WeatherApp = () => {
             units: unit,
             appid: API_KEY,
           },
+          timeout: 10000, // 10 second timeout
         })
       ]);
       
@@ -235,7 +260,23 @@ const WeatherApp = () => {
       
     } catch (error) {
       console.error("Error fetching weather data:", error);
-      setLocationError("Failed to fetch weather data. Please try again.");
+      let errorMessage = "Failed to fetch weather data. Please try again.";
+      
+      if (error.code === 'ECONNABORTED') {
+        errorMessage = "Request timed out. Please check your internet connection and try again.";
+      } else if (error.response) {
+        if (error.response.status === 401) {
+          errorMessage = "API key is invalid. Please check your configuration.";
+        } else if (error.response.status === 404) {
+          errorMessage = "Weather data not found for this location.";
+        } else if (error.response.status >= 500) {
+          errorMessage = "Weather service is temporarily unavailable. Please try again later.";
+        }
+      } else if (error.request) {
+        errorMessage = "Network error. Please check your internet connection.";
+      }
+      
+      setLocationError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -313,6 +354,11 @@ const WeatherApp = () => {
 
   const fetchWeather = async (searchCity = city) => {
     if (!searchCity) return;
+    
+    if (!API_KEY || API_KEY === 'your_api_key_here') {
+      setLocationError("Weather API key is not configured. Please add your API key to the .env file.");
+      return;
+    }
     
     setLoading(true);
     setLocationError(null);

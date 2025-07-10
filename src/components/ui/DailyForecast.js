@@ -27,7 +27,7 @@ const DailyForecast = ({ extendedForecast, getWeatherIcon, darkMode }) => {
           
           return (
             <motion.div
-              key={index}
+              key={`day-${index}-${day.date.toISOString()}`}
               className={`flex flex-col items-center gap-4 p-5 rounded-xl border transition-all duration-300 min-w-[140px] md:min-w-[160px] lg:min-w-[180px] text-center flex-shrink-0 hover:-translate-y-2 hover:shadow-lg group ${
                 darkMode
                   ? 'bg-white/3 border-white/3 hover:bg-white/8'
@@ -50,9 +50,9 @@ const DailyForecast = ({ extendedForecast, getWeatherIcon, darkMode }) => {
                     ? 'bg-white/5 group-hover:bg-white/10'
                     : 'bg-white/10 group-hover:bg-white/20'
                 }`}>
-                  <DayIcon size={40} className={
+                  <DayIcon className={`w-10 h-10 ${
                     darkMode ? 'text-blue-200/80' : 'text-white/80'
-                  } />
+                  }`} />
                 </div>
               </div>
               

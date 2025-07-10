@@ -16,7 +16,7 @@ const WeatherCard = ({ weather, unit, WeatherIcon, darkMode }) => {
         animate={{ scale: 1, rotate: 0 }}
         transition={{ duration: 1, delay: 0.3, type: "spring", stiffness: 260, damping: 20 }}
       >
-        <WeatherIcon size={120} />
+        <WeatherIcon className="w-30 h-30 text-white dark:text-blue-100" />
       </motion.div>
       
       <motion.div 

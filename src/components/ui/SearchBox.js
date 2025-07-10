@@ -29,6 +29,13 @@ const SearchBox = ({
       return;
     }
 
+    if (!API_KEY || API_KEY === 'your_api_key_here') {
+      console.warn('Weather API key is not configured. Suggestions will not work.');
+      setSuggestions([]);
+      setShowSuggestions(false);
+      return;
+    }
+
     try {
       setIsLoadingSuggestions(true);
       const response = await fetch(
@@ -151,15 +158,8 @@ const SearchBox = ({
   };
 
   const handleDarkModeToggle = () => {
-    console.log('Dark mode toggle clicked, current state:', darkMode);
-    console.log('setDarkMode function:', typeof setDarkMode);
-    
     if (typeof setDarkMode === 'function') {
-      const newDarkMode = !darkMode;
-      console.log('Setting dark mode to:', newDarkMode);
-      setDarkMode(newDarkMode);
-    } else {
-      console.error('setDarkMode is not a function:', setDarkMode);
+      setDarkMode(!darkMode);
     }
   };
 
@@ -181,9 +181,20 @@ const SearchBox = ({
     return () => {
       if (searchTimeoutRef.current) {
         clearTimeout(searchTimeoutRef.current);
+        searchTimeoutRef.current = null;
       }
     };
   }, []);
+
+  // Cleanup timeout when component unmounts or city changes
+  useEffect(() => {
+    return () => {
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+        searchTimeoutRef.current = null;
+      }
+    };
+  }, [city]);
 
   return (
     <div className={`font-sf-pro w-screen h-screen transition-all duration-500 ${
@@ -207,6 +218,8 @@ const SearchBox = ({
           `}
           onClick={handleDarkModeToggle}
           style={{ cursor: 'pointer' }}
+          aria-label={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+          title={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
         >
           <div className="w-5 h-5 flex items-center justify-center">
             {darkMode ? (

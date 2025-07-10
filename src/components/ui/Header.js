@@ -48,6 +48,8 @@ const Header = ({ location, country, darkMode, setDarkMode }) => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1 }}
+        aria-label={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+        title={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
       >
         <motion.div
           key={darkMode ? 'sun' : 'moon'}
